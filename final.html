@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Última Vuelta 🏎️</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+/* =========================================
+   FUENTES Y VARIABLES
+========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Formula1:wght@700&family=Poppins:wght@300;400;600;700;800&display=swap');
+
+:root {
+    --negro: #0b0b0b;
+    --negro2: #15151e;
+    --rojo: #e10600;
+    --rojo-claro: #ff2b20;
+    --blanco: #ffffff;
+    --gris: #888888;
+    --gris-oscuro: #22222a;
+    --carbono: #18181c;
+}
+
+/* =========================================
+   RESET
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: radial-gradient(circle at center, #1f1f27 0%, #0d0d11 50%, #050507 100%);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    overflow-x: hidden;
+    color: white;
+    position: relative;
+}
+
+/* =========================================
+   PANTALLA INICIAL (TEMÁTICA FÓRMULA 1)
+========================================= */
+.pantalla-inicio {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #181820 0%, #0a0a0d 60%, #000000 100%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.pantalla-inicio.oculta {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Efecto Gráfica Carbono / Pista */
+.fondo-estrellas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: 
+        linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px,
+        linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0px,
+        linear-gradient(27deg, #222 5px, transparent 5px) 0px 10px,
+        linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px;
+    background-size: 20px 20px;
+    opacity: 0.15;
+}
+
+.contenido-inicio {
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
+    width: 90%;
+    background: rgba(18, 18, 24, 0.85);
+    border: 2px solid var(--rojo);
+    border-radius: 16px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.9), 0 0 30px rgba(225, 6, 0, 0.25);
+    backdrop-filter: blur(10px);
+}
+
+.contenido-inicio h1 {
+    font-size: 2rem;
+    color: var(--blanco);
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px rgba(225, 6, 0, 0.5);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Semáforo F1 en la pantalla inicial */
+.semaforo-inicio {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    background: #000;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    margin: 0 auto 30px;
+    width: fit-content;
+}
+
+.luces-inicio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #222;
+    border: 1px solid #444;
+}
+
+.btn-comenzar-inicio {
+    background: linear-gradient(135deg, var(--rojo), #900000);
+    border: none;
+    color: #ffffff;
+    padding: 14px 32px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(225, 6, 0, 0.4);
+}
+
+.btn-comenzar-inicio:hover {
+    background: linear-gradient(135deg, var(--rojo-claro), var(--rojo));
+    box-shadow: 0 0 25px rgba(225, 6, 0, 0.8);
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* =========================================
+   LÍNEAS DE PISTA (BACKGROUND)
+========================================= */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 90px,
+        rgba(255,255,255,0.025) 91px,
+        transparent 92px
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* =========================================
+   CONFETI
+========================================= */
+.confeti {
+    position: fixed;
+    top: -30px;
+    width: 8px;
+    height: 16px;
+    z-index: 1;
+    pointer-events: none;
+    animation: caer linear infinite;
+}
+
+@keyframes caer {
+    0% { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* =========================================
+   BANDERA A CUADROS
+========================================= */
+.bandera {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: repeating-conic-gradient(#fff 0% 25%, #111 0% 50%) 0 / 24px 24px;
+    z-index: 10;
+}
+
+/* =========================================
+   SECCIÓN DEDICATORIA
+========================================= */
+.seccion-dedicatoria {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+}
+
+.contenedor-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    max-width: 1250px;
+    width: 100%;
+}
+
+.tarjeta-media {
+    background: #111;
+    border: 3px solid #2b2b2b;
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(225,6,0,0.25);
+    flex: 1 1 500px;
+    max-width: 580px;
+    height: 560px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.tarjeta-media::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #e10600, #ff2b20, #e10600);
+}
+
+.tarjeta-media video,
+.tarjeta-media img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: contain;
+    background: #050505;
+    transition: opacity 0.4s ease;
+}
+
+.oculto { display: none !important; }
+
+/* =========================================
+   CARTA
+========================================= */
+.tarjeta-carta {
+    background: linear-gradient(145deg, #1c1c1c, #080808);
+    border-radius: 18px;
+    border: 2px solid #292929;
+    padding: 45px 38px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 35px rgba(225,6,0,0.18);
+    text-align: center;
+    flex: 1 1 400px;
+    max-width: 500px;
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.tarjeta-carta::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 7px;
+    background: var(--rojo);
+}
+
+.tarjeta-carta::after {
+    content: "🏁";
+    position: absolute;
+    right: 18px;
+    bottom: 12px;
+    font-size: 28px;
+    opacity: 0.25;
+}
+
+.contador {
+    font-size: 0.9rem;
+    color: var(--rojo);
+    margin-bottom: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.tarjeta-carta h2 {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    transition: opacity 0.3s ease;
+}
+
+.tarjeta-carta h2::after {
+    content: "";
+    display: block;
+    width: 70px;
+    height: 4px;
+    background: var(--rojo);
+    margin: 12px auto 0;
+    border-radius: 5px;
+}
+
+.tarjeta-carta p {
+    color: #d0d0d0;
+    font-size: 1.03rem;
+    line-height: 1.8;
+    margin-bottom: 30px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+#btnSiguiente {
+    background: linear-gradient(135deg, #e10600, #a90000);
+    color: white;
+    border: none;
+    padding: 14px 38px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 20px rgba(225,6,0,0.35);
+    transition: transform 0.2s, box-shadow 0.3s, background 0.3s;
+}
+
+#btnSiguiente:hover {
+    background: linear-gradient(135deg, #ff2b20, #c40000);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(225,6,0,0.55);
+}
+
+/* =========================================
+   PANTALLA FINAL
+========================================= */
+.pantalla-final {
+    display: none;
+    min-height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 5;
+    padding: 20px;
+}
+
+.container-final {
+    position: relative;
+    width: 350px;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circulo-f1 {
+    position: absolute;
+    width: 330px;
+    height: 330px;
+    border-radius: 50%;
+    border: 2px solid rgba(225,6,0,0.25);
+    box-shadow: 0 0 50px rgba(225,6,0,0.12);
+}
+
+.luces {
+    position: absolute;
+    top: 35px;
+    display: flex;
+    gap: 10px;
+}
+
+.luz {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #300000;
+    border: 2px solid #555;
+    box-shadow: inset 0 0 8px #000;
+}
+
+.icon-wrapper {
+    font-size: 75px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    user-select: none;
+    z-index: 10;
+    position: absolute;
+}
+
+.icon-wrapper:hover { transform: scale(1.1); }
+
+.instruccion {
+    position: absolute;
+    top: 115px;
+    text-align: center;
+    color: #aaa;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.Para_Ti {
+    position: absolute;
+    width: 100%;
+    min-height: 340px;
+    padding: 40px 28px;
+    background: linear-gradient(145deg, #1b1b1b, #050505);
+    border: 2px solid #e10600;
+    border-radius: 18px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 35px rgba(225,6,0,0.3);
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.Para_Ti.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.Para_Ti h1 {
+    font-size: 2.2rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.Para_Ti h1 span { color: #e10600; }
+
+.Para_Ti p {
+    font-size: 1.05rem;
+    color: #ddd;
+    line-height: 1.7;
+    font-weight: 300;
+}
+
+.bandera-final {
+    margin-top: 25px;
+    width: 100px;
+    height: 20px;
+    background: repeating-conic-gradient(#fff 0% 25%, #111 0% 50%) 0 / 20px 20px;
+}
+
+.navegacion-final {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.btn-index {
+    display: inline-block;
+    text-decoration: none;
+    background: linear-gradient(135deg, #e10600, #a90000);
+    color: #ffffff;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 5px 20px rgba(225, 6, 0, 0.35);
+    transition: all 0.3s ease;
+}
+
+.btn-index:hover {
+    background: linear-gradient(135deg, #ff2b20, #c40000);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(225, 6, 0, 0.55);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+    .contenedor-grid { gap: 30px; }
+    .tarjeta-media { max-width: 700px; height: 520px; }
+    .tarjeta-carta { max-width: 700px; min-height: 430px; }
+}
+
+@media (max-width: 600px) {
+    .seccion-dedicatoria { padding: 15px; }
+    .contenedor-grid { gap: 20px; }
+    .tarjeta-media { width: 100%; height: 420px; padding: 9px; border-radius: 15px; }
+    .tarjeta-carta { width: 100%; min-height: 390px; padding: 30px 22px; border-radius: 16px; }
+    .tarjeta-carta h2 { font-size: 1.7rem; }
+    .tarjeta-carta p { font-size: 0.93rem; line-height: 1.65; }
+    #btnSiguiente { padding: 12px 25px; font-size: 0.9rem; }
+    .container-final { width: 95%; }
+    .Para_Ti { padding: 35px 22px; }
+    .Para_Ti h1 { font-size: 1.8rem; }
+    .contenido-inicio h1 { font-size: 1.5rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="pantalla-inicio" id="pantallaInicio">
+    <div class="fondo-estrellas"></div>
+    <div class="contenido-inicio">
+        <div class="semaforo-inicio">
+            <div class="luces-inicio" style="background: var(--rojo); box-shadow: 0 0 10px var(--rojo);"></div>
+            <div class="luces-inicio" style="background: var(--rojo); box-shadow: 0 0 10px var(--rojo);"></div>
+            <div class="luces-inicio" style="background: var(--rojo); box-shadow: 0 0 10px var(--rojo);"></div>
+        </div>
+        <h1>Que Dios sea el guardián de tu vida 🏎️</h1>
+        <button class="btn-comenzar-inicio" onclick="iniciarExperiencia()">INICIAR CARRERA 🏁</button>
+    </div>
+</div>
+
+<div class="bandera"></div>
+
+<script>
+// Generar confeti de fondo
+for (let i = 0; i < 100; i++) {
+    const confeti = document.createElement("div");
+    confeti.classList.add("confeti");
+    confeti.style.left = Math.random() * 100 + "vw";
+    confeti.style.animationDuration = (Math.random() * 4 + 4) + "s";
+    confeti.style.animationDelay = Math.random() * 6 + "s";
+
+    const colores = ["#e10600", "#ffffff", "#777777", "#ffcc00"];
+    confeti.style.background = colores[Math.floor(Math.random() * colores.length)];
+
+    document.body.appendChild(confeti);
+}
+
+function iniciarExperiencia() {
+    document.getElementById("pantallaInicio").classList.add("oculta");
+    const video = document.getElementById("videoPrincipal");
+    if (video) {
+        video.play().catch(() => console.log("Auto-play prevenido."));
+    }
+}
+</script>
+
+<section class="seccion-dedicatoria" id="seccionFotos">
+    <div class="contenedor-grid">
+
+        <div class="tarjeta-media">
+            <video id="videoPrincipal" controls autoplay muted loop>
+                <source src="Jos/pasarela.mp4" type="video/mp4">
+                Tu navegador no soporta el formato de video.
+            </video>
+            <img id="imagenPrincipal" class="oculto" src="" alt="Foto especial">
+        </div>
+
+        <div class="tarjeta-carta">
+            <div class="contador" id="contadorPagina">VUELTA 1 / 13</div>
+            <h2 id="tituloCarta">Para Ti, Que Has Sido Importante</h2>
+            <p id="textoCarta">
+                la verdad es que no se ni como surgio este video te pedi las fotos no las enviaste asi que las busque por mi cuenta y una disculpa por ese atrevimiento pero la verdad es que queria hacer algo especial y tenia que llevar mi toque de humor. No seria epico una pasarela ya estas para que vayas a Miss Mundo xdxdx. Yo dije esto tiene que ir por que es una fase del o me odias o me amas o te caigo mas mal, pero ya tenia esto en mente y no podia dejarlo pasar. Y bueno espero que te guste y que te saque una sonrisa como las que me saco haciendo esto.
+            </p>
+            <button id="btnSiguiente" onclick="cambiarTarjeta()">Siguiente vuelta 🏎️</button>
+        </div>
+
+    </div>
+</section>
+
+<section class="pantalla-final" id="pantallaFinal">
+    <div class="container-final">
+        <div class="circulo-f1"></div>
+
+        <div class="luces">
+            <div class="luz"></div>
+            <div class="luz"></div>
+            <div class="luz"></div>
+            <div class="luz"></div>
+            <div class="luz"></div>
+        </div>
+
+        <div class="instruccion" id="instruccion">Presiona para comenzar 🏁</div>
+
+        <div class="icon-wrapper" id="emojiIcon">🏁</div>
+
+        <div class="Para_Ti" id="loveCard">
+            <h1>¡Última vuelta, <span>campeón!</span> 🏎️</h1>
+
+            <p>
+                Y bueno… después de tantas fotos, recuerdos, bromas y fases lunares, llegamos a la última vuelta.
+                <br><br>
+                Espero que todo esto te haya sacado aunque sea una sonrisa y que puedas guardar estos recuerdos como una pequeña parte de una etapa que, para mí, también fue especial.
+                <br><br>
+                Ahora sí… <strong>bandera a cuadros. 🏁</strong>
+            </p>
+
+            <div class="bandera-final"></div>
+
+            <div class="navegacion-final">
+                <a href="index.html" class="btn-index">
+                    🏁 fin de la carrera
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+const tarjetas = [
+    {
+        esVideo: true,
+        archivo: "Jos/pasarela.mp4",
+        titulo: "Para Ti, Que Has Sido Importante",
+        texto: "la verdad es que no se ni como surgio este video te pedi las fotos no las enviaste asi que las busque por mi cuenta y una disculpa por ese atrevimiento pero la verdad es que queria hacer algo especial y tenia que llevar mi toque de humor. No seria epico una pasarela ya estas para que vayas a Miss Mundo xdxdx. Yo dije esto tiene que ir por que es una fase del o me odias o me amas o te caigo mas mal, pero ya tenia esto en mente y no podia dejarlo pasar. Y bueno espero que te guste y que te saque una sonrisa como las que me saco haciendo esto."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/concentracion.jpeg",
+        titulo: "Según ellos, los más inteligentes",
+        texto: "Cuando no anda con los cables haciendo circuitos, es una persona bastante concentrada. Creo que cuando trabajaba conmigo sufría un poquito porque yo era y soy de las de: “hay que hacerlo y hay que dejarlo listo hoy”. Lo siento, me gusta tener todo a tiempo. Y sí, cuando quiere, también puede ser responsable. Como te he dicho, camina con las fases lunares. Pero bueno, aquí no sé exactamente qué estaban haciendo en clase; solo tomé la foto y parecían estar haciendo algo importante… o al menos eso parecía."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/elote.jpeg",
+        titulo: "Un Recuerdo Bonito",
+        texto: "Porque hasta los momentos más sencillos pueden convertirse en recuerdos inolvidables. Si recuerdas este momento, fue cuando... sí, nuestro primer beso. Y un día más de burlas de los chavalos, más que entre renqueando. Después de aquello, todo cambió..."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/enseñando a manejar a la Genesis.jpeg",
+        titulo: "Sus Aventuras",
+        texto: "Aquí no sé qué pasó porque no estaba presente, pero de acuerdo con lo que escuché, no podías arrancar la moto porque la tenías en otro cambio. Casi te da un infarto porque tenía ahogado el motor la Genesis, esa moto que tanto amas. Pero sé que fue un buen momento para ti, así que aquí lo dejo."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/esperando.jpeg",
+        titulo: "La Espera",
+        texto: "A veces esperar también forma parte de esas historias que después recordamos con una sonrisa. Y bueno… tú puedes ser muy caballeroso, pero en ocasiones también te sale lo bruto, lo descortés y ese comportamiento que deja bastante que desear. Muchas veces te he dicho las cosas para que mejores, y debo reconocer que cuando quieres, sí lo haces. Creo que si te he conocido por varias fases lunares y también he tenido bastante paciencia contigo. Aunque, siendo sincera, conmigo en algunas ocasiones has sido demasiado descortés. Hay veces que pienso: “Bueno, todos tenemos malos días”, pero cuando ya es seguido uno empieza a preguntarse si acaso me toca pagar lo que otros te hacen y no tomármelo personal. También reconozco que yo no siempre pongo las cosas fáciles. Sé que a veces te saco de quicio y por eso también te pido disculpas. Soy bastante directa con lo que digo y con mis expresiones, y puede que algunas veces lo diga de una manera más tajante de lo necesario. Nunca ha sido mi intención hacerte sentir mal."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/fondo.jpeg",
+        titulo: "Foto Favorita",
+        texto: "Mi foto favorita… no sé por qué, pero desde que la vi me encanta. Aunque hubo alguien que decidió borrármela de la computadora, como si le estorbara que yo tuviera la foto. Según él, no la borró… pero qué casualidad que justo el día que le presté mi computadora, la foto disappeared y la carpeta desapareció de hecho. Y tranquilo, si algún día quieres que desaparezca también de mi celular, solo me dices y te la paso para que tú mismo las borres."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/primera cita.jpeg",
+        titulo: "Las Primeras Veces",
+        texto: "El día que fuimos por un helado a Pops. Ese día me la pasé riéndome de ti y de tus tragedias, como siempre. Hasta que pasó aquello por lo que terminaste bloqueándome… todo porque te dije que te estaban quedando mirando y, cuando volteé a ver, yo le correspondí a la chica con una risa de saludo. Tú, por supuesto, pensaste que yo estaba ligando. Qué bárbara la mujer. Pero, dejando el drama de lado, la verdad es que fue un buen día. Me reí muchísimo contigo y creo que ese día se notaba que teníamos cierta química. Aunque, siendo sincera, creo que confundí un poquito la amabilidad y la amistad con que realmente me gustabas. Y ni hablar de la malteada… porque el helado claramente no era suficiente. JAJA. Pero hubo un momento que sí recuerdo especialmente. Fue la primera vez que miraste mis ojos de verdad. El sol de la tarde pegaba justo en ellos y me dijiste que nunca los habías mirado así. Y después soltaste algo como: “Qué bonitos ojos… hasta me reflejo en ellos”."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/promocion.jpeg",
+        titulo: "Un Día Especial",
+        texto: "La foto de tu promoción. Esta también es de mis favoritas. Aquí sí se te ve bien, se bañó el muchacho. Entre tanta gente, por fin las fases lunares estaban a tu favor y no estabas en eclipse. JAJAJA. La verdad, me gusta mucho esta foto. Se ve bonito ese recuerdo de tu promoción y, bueno, había que dejarla aquí porque no siempre se tiene la oportunidad de encontrar una foto tuya donde las fases lunares estén perfectamente alineadas."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/sangre.jpeg",
+        titulo: "Donación de Sangre",
+        texto: "La donación de sangre. Aquí sí me quedó una pregunta: ¿qué ser humano va a recibir esa sangre? Porque ahora me preocupa que se le pegue lo lunático, lo egocéntrico… digo, lo vanidoso; que le agarre lo moreno, lo chocolatado, lo amargado o alguna de esas cosas que vienen de fábrica. Aunque también existe la posibilidad de que se le pegue lo bueno: lo caballero, lo detallista, lo respetuoso y todo eso que, de vez en cuando, sí aparece. Ahora la pregunta importante es: ¿seguirá vivo o viva después de recibir semejante combinación? ¿O tendrá que hacer un “abracadabra” para sobrevivir? Ya hablando en serio, sé que no eres de los que hacen eso y que crees en Dios… aunque yo siga diciéndote ateo solo para molestarte."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/sus mamis.jpeg",
+        titulo: "El Amor Eterno",
+        texto: "Las mujeres más importantes. No hay nada más importante que el amor maternal y tienes la dicha de tener dos. Quise incluir esta foto de tus mamás porque mi idea original era conseguir una carta escrita por ellas para ti. La verdad, quería que fuera una sorpresa bonita… pero el niño pregunta por todo, quiere saberlo todo y no se pudo. Así que me tocó cambiar la idea, pero al menos pude dejar esta foto aquí, porque sé que ellas son dos de las mujeres más importantes de tu vida. Aunque, siendo sincera, me encantaría algún día ver a estas dos doñas regañándote. Siento que entre las dos te ponen en tu lugar y hasta te cae un escobazo si te pasas de listo. JAJAJA. Y bueno… tu mamá se ve más joven que yo. A sus poderosos 40 ya no sé si decirle “doña” porque capaz se ofende conmigo. Pero hablando en serio, se nota que son dos personas muy importantes para ti."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/le gane en uno.jpeg",
+        titulo: "Jugando UNO",
+        texto: "Este momento tenía que estar aquí. Porque sí, hay que recordar quién fue el verdadero campeón. Las remontadas del UNO eran épicas. En serio que perdí. Jugando UNO, una vez te hice agarrar 26 cartas con puro +4 y +2. Y yo bien feliz diciendo: “Voy a remontar”. JAJAJA. Y aunque hiciste una cantidad de remontadas que ya ni recuerdo, si ganabas… naaah, no me importaba tanto ganar. Mi verdadero objetivo era no dejarte ganar a ti. Entre tantas partidas, risas, conversaciones y aquel famoso “hace frío en la cima”, también empezamos a hablar más y a caminar juntos. Y creo que fue por esos días cuando empezó una etapa diferente, de esas que uno no planea y que poco a poco se van convirtiendo en buenos recuerdos."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/hobby.jpeg",
+        titulo: "Lo Que Te Apasiona",
+        texto: "Sé que una de las cosas que más te gusta es conocer lugares nuevos. Siempre que tienes la oportunidad, buscas salir, conocer algo diferente y llevarte una nueva experiencia. Y la verdad, me gusta esa parte de ti, porque se nota cuando estás disfrutando el momento. Al final, cada lugar al que vas termina siendo otra historia más para contar… y seguro alguna otra frase tuya de “de una” por ahí."
+    },
+    {
+        esVideo: false,
+        archivo: "Jos/locos.jpeg",
+        titulo: "Sus Momentos Locos",
+        texto: "Tus amigos son bastante diferentes entre sí, pero con ellos también he podido conocer un poquito más de ti. He visto que con ellos puedes ser tú mismo, aunque también he visto que, a veces, tus actitudes te meten en problemas. Y aunque digas que “son hombres” y que entre ustedes se llevan así, creo que alguna que otra disculpa sí te deben escuchar de vez en cuando. No porque sean tus amigos tienes que tratar siempre todo de la misma manera. Recuerdo aquel día que te enojaste conmigo porque decías que no entendías por qué ellos se reían de ti cuando te molestaban conmigo. Yo te dije que conmigo era fácil hacerme enojar y que, cuando te molestaban conmigo, tú solo te quedabas con tu famoso “mae, mae…” sin saber qué decir. Incluso llegué a pensar que hasta un poquito de celos te daban. Pero quién sabe. Sé que llevan como cinco años de amistad y no sé si siempre han sido así contigo o simplemente es parte de tu forma de ser. Lo que sí sé es que, aunque a veces no lo parezca, se preocupan por ti. Ellos mismos me aconsejaban que tuviera paciencia contigo, que hablara contigo cuando no estuvieras enojado y que intentara arreglar las cosas hablando. Y créeme, lo intenté. Hice lo posible por tener paciencia, hablar contigo y entenderte un poquito más. También me fui dando cuenta de que realmente están pendientes de ti. Sebas y la Genesis, por ejemplo, siempre estaban ahí. Fran también me causaba curiosidad, y Julio hasta terminaba mandando a Fran a preguntarme por ti, como si yo tuviera todas las respuestas. Pero fuera de bromas, me gustó ver esa parte de ellos: la manera en que se preocupan por ti y cómo, a su manera, están presentes. Y creo que hasta aquí llega este pequeño espacio. No sé si logré reunir todos los recuerdos que quería, pero sí quise dejarte un poquito de todo: risas, momentos, fotos, anécdotas y algunas cosas que quizá nunca te había dicho. Espero que te guste y que, cuando lo vuelvas a ver algún día, puedas recordar todo esto con una sonrisa."
+    }
+];
+
+let pos = 0;
+
+function cambiarTarjeta() {
+    pos++;
+
+    if (pos >= tarjetas.length) {
+        document.getElementById("seccionFotos").style.display = "none";
+        document.getElementById("pantallaFinal").style.display = "flex";
+        iniciarLuces();
+        return;
+    }
+
+    const videoEl = document.getElementById("videoPrincipal");
+    const imgEl = document.getElementById("imagenPrincipal");
+    const titulo = document.getElementById("tituloCarta");
+    const texto = document.getElementById("textoCarta");
+    const contador = document.getElementById("contadorPagina");
+
+    videoEl.style.opacity = "0";
+    imgEl.style.opacity = "0";
+    titulo.style.opacity = "0";
+    texto.style.opacity = "0";
+
+    setTimeout(() => {
+        const actual = tarjetas[pos];
+
+        if (actual.esVideo) {
+            imgEl.classList.add("oculto");
+            videoEl.classList.remove("oculto");
+            videoEl.src = actual.archivo;
+            videoEl.load();
+            videoEl.currentTime = 0;
+            videoEl.play().catch(() => console.log("Presiona reproducir."));
+        } else {
+            videoEl.pause();
+            videoEl.classList.add("oculto");
+            imgEl.classList.remove("oculto");
+            imgEl.src = actual.archivo;
+        }
+
+        titulo.innerText = actual.titulo;
+        texto.innerText = actual.texto;
+        contador.innerText = "VUELTA " + (pos + 1) + " / " + tarjetas.length;
+
+        videoEl.style.opacity = "1";
+        imgEl.style.opacity = "1";
+        titulo.style.opacity = "1";
+        texto.style.opacity = "1";
+    }, 300);
+}
+
+function iniciarLuces() {
+    const luces = document.querySelectorAll(".luz");
+    let contador = 0;
+
+    const intervalo = setInterval(() => {
+        if (contador < luces.length) {
+            luces[contador].style.background = "#e10600";
+            luces[contador].style.boxShadow = "0 0 20px #e10600";
+            contador++;
+        } else {
+            clearInterval(intervalo);
+            setTimeout(() => {
+                luces.forEach(luz => {
+                    luz.style.background = "#111";
+                    luz.style.boxShadow = "none";
+                });
+            }, 700);
+        }
+    }, 500);
+}
+
+const emojiIcon = document.getElementById("emojiIcon");
+const loveCard = document.getElementById("loveCard");
+const instruccion = document.getElementById("instruccion");
+
+let isBomb = false;
+
+emojiIcon.addEventListener("click", () => {
+    if (!isBomb) {
+        emojiIcon.textContent = "💣";
+        isBomb = true;
+        instruccion.textContent = "Ahora presiónalo otra vez 💥";
+    } else {
+        triggerHeartConfetti();
+        emojiIcon.style.display = "none";
+        instruccion.style.display = "none";
+        loveCard.classList.add("active");
+    }
+});
+
+function triggerHeartConfetti() {
+    const defaults = {
+        spread: 360,
+        ticks: 100,
+        gravity: 0.5,
+        decay: 0.94,
+        startVelocity: 30,
+        shapes: ['heart'],
+        colors: ['#e10600', '#ff2b20', '#ffffff', '#ff4d6d']
+    };
+
+    confetti({ ...defaults, particleCount: 100, scalar: 2 });
+    confetti({ ...defaults, particleCount: 70, scalar: 1.5 });
+
+    setTimeout(() => {
+        confetti({ ...defaults, particleCount: 50, scalar: 1 });
+    }, 500);
+}
+</script>
+
+</body>
+</html>

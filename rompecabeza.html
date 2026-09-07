@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Rompecabezas Personalizado 🧩</title>
+
+    <style>
+
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family:
+                'Segoe UI',
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+        /* =========================================
+           NAVEGACIÓN
+        ========================================= */
+
+        .navbar {
+            width: 100%;
+            max-width: 1100px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 12px 15px;
+            margin-bottom: 25px;
+
+            background: rgba(30, 41, 59, 0.95);
+
+            border: 1px solid var(--border-color);
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 10px rgba(0, 0, 0, 0.3);
+
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            text-decoration: none;
+
+            color: var(--text-color);
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            font-size: 0.9rem;
+
+            font-weight: 600;
+
+            transition: all 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background: #334155;
+
+            color: var(--accent-color);
+
+            transform: translateY(-2px);
+        }
+
+        /* Página actual */
+
+        .navbar a.active {
+            background: var(--accent-color);
+
+            color: #0f172a;
+
+            box-shadow:
+                0 3px 8px rgba(56, 189, 248, 0.3);
+        }
+
+        /* =========================================
+           TITULO
+        ========================================= */
+
+        h1 {
+            margin-bottom: 10px;
+
+            color: var(--accent-color);
+
+            font-size: 2rem;
+
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+
+            margin-bottom: 25px;
+
+            text-align: center;
+        }
+
+        /* =========================================
+           CONTROLES
+        ========================================= */
+
+        .controls {
+            display: flex;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+            align-items: center;
+
+            background: var(--card-bg);
+
+            padding: 15px 25px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 6px -1px
+                rgba(0, 0, 0, 0.3);
+        }
+
+        .control-group {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+
+            font-size: 0.9rem;
+        }
+
+        select,
+        button {
+            background: #334155;
+
+            color: var(--text-color);
+
+            border: 1px solid #475569;
+
+            padding: 8px 16px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-size: 0.9rem;
+
+            transition: all 0.2s ease;
+        }
+
+        select:hover,
+        button:hover {
+            background: #475569;
+        }
+
+        button.primary {
+            background: var(--accent-color);
+
+            color: #0f172a;
+
+            font-weight: bold;
+
+            border: none;
+        }
+
+        button.primary:hover {
+            background: #7dd3fc;
+        }
+
+        /* =========================================
+           ESTADÍSTICAS
+        ========================================= */
+
+        .status-panel {
+            display: flex;
+
+            gap: 30px;
+
+            font-size: 1.1rem;
+
+            font-weight: 600;
+
+            margin-bottom: 20px;
+
+            background: var(--card-bg);
+
+            padding: 10px 20px;
+
+            border-radius: 8px;
+        }
+
+        .status-item {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+
+        /* =========================================
+           ROMPECABEZAS
+        ========================================= */
+
+        .puzzle-wrapper {
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            gap: 30px;
+
+            width: 100%;
+
+            max-width: 1000px;
+        }
+
+        #board {
+            background-color: var(--card-bg);
+
+            border: 3px dashed
+                var(--border-color);
+
+            border-radius: 12px;
+
+            position: relative;
+
+            box-shadow:
+                0 10px 15px -3px
+                rgba(0, 0, 0, 0.5);
+
+            overflow: hidden;
+        }
+
+        #pieces-container {
+            width: 100%;
+
+            min-height: 200px;
+
+            background: var(--card-bg);
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            justify-content: center;
+
+            align-items: center;
+
+            box-shadow:
+                0 4px 6px -1px
+                rgba(0, 0, 0, 0.3);
+
+            border:
+                1px solid
+                var(--border-color);
+        }
+
+        .puzzle-piece {
+            cursor: grab;
+
+            user-select: none;
+
+            box-shadow:
+                0 2px 5px
+                rgba(0, 0, 0, 0.4);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.2);
+
+            border-radius: 4px;
+
+            transition:
+                transform 0.1s ease;
+        }
+
+        .puzzle-piece:active {
+            cursor: grabbing;
+
+            transform: scale(1.05);
+
+            z-index: 100;
+        }
+
+        .board-slot {
+            position: absolute;
+
+            box-sizing: border-box;
+
+            border:
+                1px dashed
+                rgba(255, 255, 255, 0.15);
+        }
+
+        /* =========================================
+           MODAL DE VICTORIA
+        ========================================= */
+
+        .modal {
+            display: none;
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background:
+                rgba(0, 0, 0, 0.8);
+
+            justify-content: center;
+
+            align-items: center;
+
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+
+            padding: 30px 50px;
+
+            border-radius: 16px;
+
+            text-align: center;
+
+            box-shadow:
+                0 20px 25px -5px
+                rgba(0, 0, 0, 0.5);
+
+            border:
+                1px solid
+                var(--accent-color);
+        }
+
+        .modal-content h2 {
+            color: var(--accent-color);
+
+            font-size: 2rem;
+
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+
+            font-size: 1.1rem;
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (min-width: 850px) {
+
+            .puzzle-wrapper {
+                flex-direction: row;
+
+                align-items: flex-start;
+            }
+
+            #pieces-container {
+                flex: 1;
+
+                min-height: 400px;
+
+                align-content: flex-start;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 12px;
+            }
+
+            .navbar {
+                gap: 5px;
+
+                padding: 10px;
+            }
+
+            .navbar a {
+                font-size: 0.8rem;
+
+                padding: 8px 10px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .status-panel {
+                gap: 15px;
+
+                font-size: 0.9rem;
+            }
+
+            .modal-content {
+                margin: 20px;
+
+                padding: 25px 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         NAVEGACIÓN
+    ========================================= -->
+
+    <nav class="navbar">
+     <a href="album.html">
+            Memories
+        </a>
+
+    </nav>
+
+
+    <!-- =========================================
+         TITULO
+    ========================================= -->
+
+    <h1>
+        Rompecabeza para mi rompecabeza 🧩
+    </h1>
+    <h3>
+        ¡Pero mi rompecabezas no he podido armarlo todavía!¡suerte!. 
+   </h3>
+
+
+    <p class="subtitle">
+        Arrastra y suelta las piezas
+        para armar la imagen
+    </p>
+
+
+    <!-- =========================================
+         CONTROLES
+    ========================================= -->
+
+    <div class="controls">
+
+        <div class="control-group">
+
+            <label for="difficulty">
+                Dificultad:
+            </label>
+
+            <select id="difficulty">
+
+                <option value="3">
+                    Fácil (3x3 - 9 piezas)
+                </option>
+
+                <option value="4" selected>
+                    Normal (4x4 - 16 piezas)
+                </option>
+
+                <option value="5">
+                    Difícil (5x5 - 25 piezas)
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            id="btn-restart"
+            class="primary">
+
+            Reiniciar Juego
+
+        </button>
+
+    </div>
+
+
+    <!-- =========================================
+         ESTADÍSTICAS
+    ========================================= -->
+
+    <div class="status-panel">
+
+        <div class="status-item">
+
+            <span>
+                Movimientos:
+            </span>
+
+            <span
+                id="move-count"
+                style="color: var(--accent-color);">
+
+                0
+
+            </span>
+
+        </div>
+
+
+        <div class="status-item">
+
+            <span>
+                Tiempo:
+            </span>
+
+            <span
+                id="timer"
+                style="color: var(--accent-color);">
+
+                00:00
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         ROMPECABEZAS
+    ========================================= -->
+
+    <div class="puzzle-wrapper">
+
+        <div id="board"></div>
+
+        <div id="pieces-container"></div>
+
+    </div>
+
+
+    <!-- =========================================
+         VENTANA DE VICTORIA
+    ========================================= -->
+
+    <div id="win-modal" class="modal">
+
+        <div class="modal-content">
+
+            <h2>
+                ¡Felicidades! 🎉
+            </h2>
+
+            <p>
+                Has completado el
+                rompecabezas exitosamente.
+            </p>
+
+            <p id="final-stats"></p>
+
+            <button
+                id="btn-play-again"
+                class="primary">
+
+                Jugar de nuevo
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================= -->
+
+    <script>
+
+        /* =================================================
+           IMAGEN FIJA DEL ROMPECABEZAS
+        ================================================= */
+
+        const defaultImage = "mi foto.jpg";
+
+        let currentImage = defaultImage;
+
+        let gridSize = 4;
+
+        let pieces = [];
+
+        let moves = 0;
+
+        let timerInterval = null;
+
+        let secondsElapsed = 0;
+
+        let gameStarted = false;
+
+
+        /* =================================================
+           ELEMENTOS
+        ================================================= */
+
+        const board =
+            document.getElementById("board");
+
+        const piecesContainer =
+            document.getElementById(
+                "pieces-container"
+            );
+
+        const difficultySelect =
+            document.getElementById(
+                "difficulty"
+            );
+
+        const btnRestart =
+            document.getElementById(
+                "btn-restart"
+            );
+
+        const moveCountDisplay =
+            document.getElementById(
+                "move-count"
+            );
+
+        const timerDisplay =
+            document.getElementById(
+                "timer"
+            );
+
+        const winModal =
+            document.getElementById(
+                "win-modal"
+            );
+
+        const btnPlayAgain =
+            document.getElementById(
+                "btn-play-again"
+            );
+
+        const finalStats =
+            document.getElementById(
+                "final-stats"
+            );
+
+
+        /* =================================================
+           CAMBIAR DIFICULTAD
+        ================================================= */
+
+        difficultySelect.addEventListener(
+            "change",
+            function(e) {
+
+                gridSize =
+                    parseInt(e.target.value);
+
+                initGame();
+
+            }
+        );
+
+
+        /* =================================================
+           REINICIAR
+        ================================================= */
+
+        btnRestart.addEventListener(
+            "click",
+            initGame
+        );
+
+
+        btnPlayAgain.addEventListener(
+            "click",
+            function() {
+
+                winModal.style.display =
+                    "none";
+
+                initGame();
+
+            }
+        );
+
+
+        /* =================================================
+           TEMPORIZADOR
+        ================================================= */
+
+        function startTimer() {
+
+            stopTimer();
+
+            secondsElapsed = 0;
+
+            timerDisplay.textContent =
+                "00:00";
+
+
+            timerInterval =
+                setInterval(
+                    function() {
+
+                        secondsElapsed++;
+
+
+                        const mins =
+                            String(
+                                Math.floor(
+                                    secondsElapsed / 60
+                                )
+                            ).padStart(
+                                2,
+                                "0"
+                            );
+
+
+                        const secs =
+                            String(
+                                secondsElapsed % 60
+                            ).padStart(
+                                2,
+                                "0"
+                            );
+
+
+                        timerDisplay.textContent =
+                            `${mins}:${secs}`;
+
+                    },
+                    1000
+                );
+
+        }
+
+
+        function stopTimer() {
+
+            if (timerInterval) {
+
+                clearInterval(
+                    timerInterval
+                );
+
+                timerInterval = null;
+
+            }
+
+        }
+
+
+        /* =================================================
+           INICIAR JUEGO
+        ================================================= */
+
+        function initGame() {
+
+            stopTimer();
+
+            gameStarted = false;
+
+            moves = 0;
+
+            moveCountDisplay.textContent =
+                moves;
+
+            timerDisplay.textContent =
+                "00:00";
+
+            board.innerHTML = "";
+
+            piecesContainer.innerHTML = "";
+
+            pieces = [];
+
+
+            const img =
+                new Image();
+
+
+            img.src =
+                currentImage;
+
+
+            img.onload =
+                function() {
+
+
+                    /* TAMAÑO DEL TABLERO */
+
+                    const maxBoardWidth =
+                        Math.min(
+                            window.innerWidth - 60,
+                            450
+                        );
+
+
+                    const aspectRatio =
+                        img.height /
+                        img.width;
+
+
+                    const boardWidth =
+                        maxBoardWidth;
+
+
+                    const boardHeight =
+                        boardWidth *
+                        aspectRatio;
+
+
+                    board.style.width =
+                        `${boardWidth}px`;
+
+
+                    board.style.height =
+                        `${boardHeight}px`;
+
+
+                    const pieceWidth =
+                        boardWidth /
+                        gridSize;
+
+
+                    const pieceHeight =
+                        boardHeight /
+                        gridSize;
+
+
+                    /* =====================================
+                       CREAR PIEZAS
+                    ===================================== */
+
+                    for (
+                        let row = 0;
+                        row < gridSize;
+                        row++
+                    ) {
+
+                        for (
+                            let col = 0;
+                            col < gridSize;
+                            col++
+                        ) {
+
+                            const index =
+                                row *
+                                gridSize +
+                                col;
+
+
+                            /* SLOT */
+
+                            const slot =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            slot.classList.add(
+                                "board-slot"
+                            );
+
+
+                            slot.style.width =
+                                `${pieceWidth}px`;
+
+
+                            slot.style.height =
+                                `${pieceHeight}px`;
+
+
+                            slot.style.top =
+                                `${row * pieceHeight}px`;
+
+
+                            slot.style.left =
+                                `${col * pieceWidth}px`;
+
+
+                            slot.dataset.index =
+                                index;
+
+
+                            slot.addEventListener(
+                                "dragover",
+                                handleDragOver
+                            );
+
+
+                            slot.addEventListener(
+                                "drop",
+                                handleDropOnBoard
+                            );
+
+
+                            board.appendChild(
+                                slot
+                            );
+
+
+                            /* PIEZA */
+
+                            const piece =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            piece.classList.add(
+                                "puzzle-piece"
+                            );
+
+
+                            piece.style.width =
+                                `${pieceWidth}px`;
+
+
+                            piece.style.height =
+                                `${pieceHeight}px`;
+
+
+                            piece.style.backgroundImage =
+                                `url("${currentImage}")`;
+
+
+                            piece.style.backgroundSize =
+                                `${boardWidth}px ${boardHeight}px`;
+
+
+                            piece.style.backgroundPosition =
+                                `-${col * pieceWidth}px -${row * pieceHeight}px`;
+
+
+                            piece.style.backgroundRepeat =
+                                "no-repeat";
+
+
+                            piece.draggable =
+                                true;
+
+
+                            piece.dataset.correctIndex =
+                                index;
+
+
+                            piece.id =
+                                `piece-${index}`;
+
+
+                            piece.addEventListener(
+                                "dragstart",
+                                handleDragStart
+                            );
+
+
+                            pieces.push(
+                                piece
+                            );
+
+                        }
+
+                    }
+
+
+                    /* PERMITIR DEVOLVER PIEZAS */
+
+                    piecesContainer.addEventListener(
+                        "dragover",
+                        handleDragOver
+                    );
+
+
+                    piecesContainer.addEventListener(
+                        "drop",
+                        handleDropOnContainer
+                    );
+
+
+                    /* MEZCLAR */
+
+                    const shuffledPieces =
+                        [...pieces].sort(
+                            () =>
+                                Math.random() - 0.5
+                        );
+
+
+                    shuffledPieces.forEach(
+                        function(piece) {
+
+                            piecesContainer.appendChild(
+                                piece
+                            );
+
+                        }
+                    );
+
+                };
+
+
+            /* ERROR DE IMAGEN */
+
+            img.onerror =
+                function() {
+
+                    alert(
+                        'No se encontró "mi foto.jpg". ' +
+                        'Asegúrate de que la imagen esté dentro de la carpeta rompecabeza y que el nombre sea exactamente "mi foto.jpg".'
+                    );
+
+                };
+
+        }
+
+
+        /* =================================================
+           ARRASTRAR PIEZA
+        ================================================= */
+
+        function handleDragStart(e) {
+
+            if (!gameStarted) {
+
+                startTimer();
+
+                gameStarted = true;
+
+            }
+
+
+            e.dataTransfer.setData(
+                "text/plain",
+                e.target.id
+            );
+
+        }
+
+
+        function handleDragOver(e) {
+
+            e.preventDefault();
+
+        }
+
+
+        /* =================================================
+           SOLTAR EN TABLERO
+        ================================================= */
+
+        function handleDropOnBoard(e) {
+
+            e.preventDefault();
+
+
+            const slot =
+                e.currentTarget;
+
+
+            const pieceId =
+                e.dataTransfer.getData(
+                    "text/plain"
+                );
+
+
+            const piece =
+                document.getElementById(
+                    pieceId
+                );
+
+
+            if (!piece) return;
+
+
+            if (
+                slot.children.length === 0
+            ) {
+
+                slot.appendChild(
+                    piece
+                );
+
+
+                piece.style.position =
+                    "static";
+
+
+                incrementMoves();
+
+
+                checkWinCondition();
+
+            }
+
+        }
+
+
+        /* =================================================
+           DEVOLVER PIEZA
+        ================================================= */
+
+        function handleDropOnContainer(e) {
+
+            e.preventDefault();
+
+
+            const pieceId =
+                e.dataTransfer.getData(
+                    "text/plain"
+                );
+
+
+            const piece =
+                document.getElementById(
+                    pieceId
+                );
+
+
+            if (
+                piece &&
+                piece.parentElement !==
+                piecesContainer
+            ) {
+
+                piecesContainer.appendChild(
+                    piece
+                );
+
+
+                piece.style.position =
+                    "static";
+
+
+                incrementMoves();
+
+            }
+
+        }
+
+
+        /* =================================================
+           CONTAR MOVIMIENTOS
+        ================================================= */
+
+        function incrementMoves() {
+
+            moves++;
+
+
+            moveCountDisplay.textContent =
+                moves;
+
+        }
+
+
+        /* =================================================
+           COMPROBAR VICTORIA
+        ================================================= */
+
+        function checkWinCondition() {
+
+            const slots =
+                board.querySelectorAll(
+                    ".board-slot"
+                );
+
+
+            let correctCount = 0;
+
+
+            slots.forEach(
+                function(slot) {
+
+                    const piece =
+                        slot.firstElementChild;
+
+
+                    if (
+                        piece &&
+                        piece.dataset.correctIndex ===
+                        slot.dataset.index
+                    ) {
+
+                        correctCount++;
+
+                    }
+
+                }
+            );
+
+
+            if (
+                correctCount ===
+                gridSize * gridSize
+            ) {
+
+                stopTimer();
+
+
+                setTimeout(
+                    function() {
+
+                        finalStats.textContent =
+                            `Movimientos: ${moves} | Tiempo: ${timerDisplay.textContent}`;
+
+
+                        winModal.style.display =
+                            "flex";
+
+                    },
+                    300
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           INICIAR AL CARGAR
+        ================================================= */
+
+        window.onload =
+            initGame;
+
+    </script>
+
+</body>
+
+</html>

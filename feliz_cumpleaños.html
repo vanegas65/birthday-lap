@@ -1,0 +1,562 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title> Alguien Especial</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #07111f, #102a43, #07111f);
+        color: #e8e8e8;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+    }
+
+    header {
+        text-align: center;
+        padding: 60px 20px 30px;
+    }
+
+    h1 {
+        font-size: 3rem;
+        color: #FFFFFF;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 8px rgba(212, 175, 55, 0.4);
+    }
+
+    .subtitulo {
+        font-size: 1.2rem;
+        color: #ffffff;
+        letter-spacing: 1px;
+        font-weight: bold;
+    }
+
+    .container {
+        max-width: 800px;
+        width: 90%;
+        margin-bottom: 50px;
+        z-index: 10;
+    }
+
+    /* GALERÍA */
+
+    .galeria {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 40px 0;
+    }
+
+    .foto-placeholder {
+        background-color: #ffffff;
+        padding: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        border-radius: 8px;
+        text-align: center;
+        transform: rotate(-3deg);
+        transition: transform 0.3s ease;
+    }
+
+    .foto-placeholder:nth-child(even) {
+        transform: rotate(3deg);
+    }
+
+    .foto-placeholder:hover {
+        transform: scale(1.05) rotate(0deg);
+    }
+
+    /* IMÁGENES */
+
+    .imagen {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 4px;
+        display: block;
+    }
+
+    .pie-foto {
+        margin-top: 12px;
+        font-size: 1.1rem;
+        color: #333333;
+        font-weight: 600;
+    }
+
+    /* CARTA */
+
+    .carta {
+        background: #ffffff;
+        color: #333333;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        line-height: 1.8;
+        position: relative;
+        border-top: 4px solid #d4af37;
+    }
+
+    .carta p {
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+    }
+
+    /* DESEO */
+
+    .deseo-bloque {
+        background: linear-gradient(135deg, #080620, #2b0303);
+        color: #ffffff;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        margin-top: 40px;
+        box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+    }
+
+    .deseo-bloque h3 {
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+    }
+
+    .deseo-bloque p {
+        font-size: 1.2rem;
+    }
+
+    /* BOTÓN SORPRESA */
+
+    .btn {
+        display: block;
+        background-color: #0EA5E9;
+        color: #07111f;
+        border: none;
+        padding: 14px 30px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.2s;
+        margin: 30px auto 0;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn:hover {
+        background-color: #ffffff;
+        color: #07111f;
+        transform: scale(1.05);
+    }
+
+    /* MENSAJE OCULTO */
+
+    #mensaje-oculto {
+        display: none;
+        margin-top: 25px;
+        padding: 20px;
+        background-color: #102a43;
+        border-left: 5px solid #d4af37;
+        border-radius: 8px;
+        font-style: italic;
+        animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    #mensaje-oculto p {
+        margin: 0;
+        color: #ffffff;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* BOTÓN REGALO */
+
+    .boton-regalo {
+        display: block;
+        width: 250px;
+        margin: 40px auto 0;
+        padding: 15px 30px;
+        background: #0EA5E9;
+        color: #07111f;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .boton-regalo:hover {
+        background: #ffffff;
+        color: #07111f;
+        transform: translateY(-4px);
+    }
+
+    /* CONFETI */
+
+    .confeti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        pointer-events: none;
+        animation: caer linear infinite;
+        top: -10px;
+        z-index: 1;
+    }
+
+    @keyframes caer {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateY(105vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    /* CELULAR */
+
+    @media (max-width: 600px) {
+
+        h1 {
+            font-size: 2.2rem;
+        }
+
+        .carta {
+            padding: 25px;
+        }
+
+        .galeria {
+            grid-template-columns: 1fr;
+        }
+
+        .imagen {
+            height: 300px;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>¡Feliz Cumpleaños! 🎉</h1>
+
+        <p class="subtitulo">
+            Hoy celebramos tu día especial ✨
+        </p>
+
+    </header>
+
+
+    
+
+    <div class="container">
+
+
+        <div class="galeria">
+
+           
+
+            <div class="foto-placeholder">
+
+                <img
+                    src="jos/heladeria.jpeg"
+                    alt="Lindo recuerdo"
+                    class="imagen"
+                >
+
+                <p class="pie-foto">
+                    ¡Un gran momento! 🤍
+                </p>
+
+            </div>
+
+
+        
+
+            <div class="foto-placeholder">
+
+                <img
+                    src="Jos/WhatsApp Image 2026-08-18 at 9.57.13 PM.jpeg"
+                    alt="Recuerdo especial"
+                    class="imagen"
+                >
+
+                <p class="pie-foto">
+                    Mi sonrisa favorita🫶🏻
+                </p>
+
+            </div>
+
+
+            
+
+            <div class="foto-placeholder">
+
+                <img
+                    src="Jos/mi cumple.jpeg"
+                    alt="Foto divertida"
+                    class="imagen"
+                >
+
+                <p class="pie-foto">
+                    Celebrando la vida 🎂
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- CARTA -->
+
+        <div class="carta">
+
+            <p>
+                <strong>
+                    ¡Feliz vuelta al sol! 🎂✨
+                </strong>
+           <p>
+    No quería dejar pasar este día sin hacer algo diferente,
+    así que decidí crear este pequeño espacio en la web solo para ti. ✨
+</p>
+
+<p>
+    Hoy celebramos oficialmente que has subido otro nivel...
+    aunque también significa que ya estás un poquito más cerca del
+    <strong>asilo</strong>. 😂 Pero tranquilo, todavía no te toca escoger
+    bastón; por ahora puedes seguir fingiendo que eres joven.
+</p>
+
+<p>
+    Espero que este nuevo año venga cargado de risas, metas cumplidas,
+    momentos inolvidables y muchas bendiciones. Que <strong>Dios</strong>
+    te acompañe, te cuide, te abra caminos y te conceda sabiduría para
+    cada decisión que tomes. 🙏✨
+</p>
+
+<p>
+    También le pediré especialmente a Dios que nos conceda
+    <strong>paciencia</strong>... a ti para soportarnos a los que te rodeamos,
+    y a nosotros para soportar tus momentos de terquedad. 😂
+    Porque, seamos sinceros, a veces pareces haber nacido con un manual
+    propio que nadie más recibió.
+</p>
+
+<p>
+    Así que, por favor, en esta nueva etapa de tu vida:
+    <strong>deja de ser tan terco</strong>. Y si existe algún manual
+    para entenderte o facilitarte las cosas, te agradecería muchísimo
+    que me lo compartieras. Me ahorraría varios dolores de cabeza. 😅
+</p>
+
+<p>
+    Fuera de bromas, deseo que Dios bendiga cada paso que des y que este
+    nuevo año te regale razones para sonreír, aprender, crecer y disfrutar
+    muchísimo de la vida.
+</p>
+
+<p>
+    Así que disfruta tu día, sonríe bastante, déjate consentir y celebra
+    como corresponde...
+</p>
+
+<p>
+    <strong>
+        porque cumplir años es inevitable, pero aceptar que ya vas camino
+        a ser un viejito elegante es opcional
+    </strong>
+</p>
+
+        </div>
+
+
+        <!-- DESEO -->
+
+        <div class="deseo-bloque">
+
+            <h3>
+                Mi mayor deseo para ti... ✨
+            </h3>
+
+            <p>
+
+Mi mayor deseo para ti es que la vida te lleve por caminos bonitos y que puedas cumplir cada una de esas metas que tienes en mente. Que este viaje a Italia sea el comienzo de muchas experiencias nuevas, de aprendizajes, aventuras y momentos que algún día recuerdes con una sonrisa.
+
+También deseo que poco a poco puedas dejar atrás todo aquello que alguna vez te hizo daño. Que puedas soltar el dolor, la tristeza, la amargura y todo lo que todavía pueda pesar en tu corazón. No tienes que olvidar lo que viviste, simplemente aprender a vivir sin que aquello siga lastimándote.
+
+Y si alguna vez tienes miedo de volver a sentir, recuerda que romperse no está mal. Todos tenemos heridas, todos hemos tenido momentos en los que sentimos que ya no podemos más. Lo importante es no permitir que esas heridas nos hagan olvidar que todavía existen cosas bonitas por vivir.
+
+Deseo que seas feliz, de verdad. Que encuentres tranquilidad, que puedas reír sin pensar demasiado, disfrutar sin miedo y querer sin estar esperando que algo salga mal.
+
+Y cuando llegue esa persona especial a tu vida, espero que sea alguien que te quiera bonito, que te cuide, que te dé paz y que te haga sentir que no tienes que protegerte todo el tiempo. Alguien a quien puedas amar sin miedo, sin dudas y sin tener que esconder lo que sientes.
+
+Ojalá puedas encontrar un amor que no duela, que no te quite la paz y que te permita ser completamente tú.
+
+Y sobre todo, espero que nunca olvides que mereces cosas buenas, incluso después de todo lo malo que hayas vivido.
+
+Que te vaya bonito en todo lo que emprendas, que cumplas tus sueños y que la vida, donde quiera que te lleve, siempre encuentre una manera de sorprenderte para bien. ✨
+
+            </p>
+
+        </div>
+
+
+        <!-- BOTÓN DE SORPRESA -->
+
+        <button class="btn" onclick="mostrarMensaje()">
+             Haz clic aquí
+        </button>
+
+
+        <!-- MENSAJE OCULTO -->
+
+        <div id="mensaje-oculto">
+
+            <p>
+                Dicen que la luna tiene fases… y yo tengo la teoría de que tú también.😂xdxd
+Tú no tienes cambios de humor, simplemente atraviesas tus propias fases lunares… unas más amables que otras, debo admitir. 😂 Y yo, con paciencia, cariño y  aquí sigo.
+
+Espero que esta pequeña sorpresa logre cambiarte de fase y te dibuje una sonrisa. Porque, aunque a veces aparezca tu versión de luna llena 🌕, sigues siendo alguien muy especial para mí.
+❤️✨
+            </p>
+
+        </div>
+
+
+        <!-- BOTÓN REGALO -->
+
+        <a
+            href="regalo-digital.html"
+            target="_blank"
+            class="boton-regalo"
+        >
+             Abre cuando estés listo
+        </a>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        /* MENSAJE SORPRESA */
+
+        function mostrarMensaje() {
+
+            const mensaje =
+                document.getElementById("mensaje-oculto");
+
+            const boton =
+                document.querySelector(".btn");
+
+            if (
+                mensaje.style.display === "none" ||
+                mensaje.style.display === ""
+            ) {
+
+                mensaje.style.display = "block";
+
+                boton.textContent = "💗 Cerrar sorpresa";
+
+            } else {
+
+                mensaje.style.display = "none";
+
+                boton.textContent = "Haz clic aquí";
+
+            }
+        }
+
+
+        /* CONFETI */
+
+        const colores = [
+            '#ff4081',
+            '#00e676',
+            '#00b0ff',
+            '#ffea00',
+            '#d500f9',
+            '#ff6d00'
+        ];
+
+
+        function crearConfeti() {
+
+            const confeti =
+                document.createElement('div');
+
+            confeti.classList.add('confeti');
+
+            confeti.style.left =
+                Math.random() * 100 + 'vw';
+
+            confeti.style.backgroundColor =
+                colores[
+                    Math.floor(
+                        Math.random() * colores.length
+                    )
+                ];
+
+            confeti.style.animationDuration =
+                Math.random() * 3 + 2 + 's';
+
+            confeti.style.opacity =
+                Math.random();
+
+            if (Math.random() > 0.5) {
+
+                confeti.style.borderRadius = '50%';
+
+            }
+
+            const tamano =
+                Math.random() * 8 + 6 + 'px';
+
+            confeti.style.width = tamano;
+            confeti.style.height = tamano;
+
+            document.body.appendChild(confeti);
+
+            setTimeout(() => {
+
+                confeti.remove();
+
+            }, 5000);
+        }
+
+
+        setInterval(crearConfeti, 150);
+
+    </script>
+
+</body>
+</html>
+
